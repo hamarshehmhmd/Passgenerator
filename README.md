@@ -12,9 +12,9 @@ PassGen is a simple command-line password generator written in Python. It genera
 ## Usage
 
 To run the program, simply execute the following commands in your terminal:
-$ git clone https://github.com/hamarshehmhmd/passgen.git
-$ cd passgen
-$ python passgen.py
+- '$ git clone https://github.com/hamarshehmhmd/passgen.git'
+- '$ cd passgen'
+- '$ python passgen.py'
 
 
 The program will display a menu of available commands and prompt the user for input.
