@@ -1,2 +1,0 @@
-Simply run the program firstly it will ask you few simple things
-firstly to generate a random password without editing the settings simply just input the number of characters.

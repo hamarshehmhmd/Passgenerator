@@ -1,35 +1,48 @@
-
-import string as digit
+import string
 import secrets
+from typing import List, Dict
 
 
 class PasswordGenerator:
     @staticmethod
-    def gen_sequence(
-            conditions,
-    ):  # must have  conditions (in a list format), for each member of the list possible_characters
+    def gen_sequence(conditions: List[bool]) -> str:
+        """Generate a sequence of characters based on given conditions.
+
+        Args:
+            conditions: A list of boolean values indicating whether to include each character type.
+
+        Returns:
+            A string containing the characters to be used for password generation.
+        """
         possible_characters = [
-            digit.ascii_lowercase,
-            digit.ascii_uppercase,
-            digit.digits,
-            digit.punctuation,
+            string.ascii_lowercase,
+            string.ascii_uppercase,
+            string.digits,
+            string.punctuation,
         ]
         sequence = ""
-        for x in range(len(conditions)):
-            if conditions[x]:
-                sequence += possible_characters[x]
-            else:
-                pass
+        for i, condition in enumerate(conditions):
+            if condition:
+                sequence += possible_characters[i]
         return sequence
 
     @staticmethod
-    def gen_password(sequence, passlength=8):
+    def gen_password(sequence: str, passlength: int = 8) -> str:
+        """Generate a password from a given sequence of characters.
+
+        Args:
+            sequence: A string containing the characters to be used for password generation.
+            passlength: The length of the password to be generated. Default is 8.
+
+        Returns:
+            A string containing the generated password.
+        """
         password = "".join((secrets.choice(sequence) for _ in range(passlength)))
         return password
 
 
 class Interface:
-    has_characters = {
+    CHARACTER_TYPES: Dict[str, bool] = {
         "lowercase": True,
         "uppercase": True,
         "digits": True,
@@ -37,63 +50,76 @@ class Interface:
     }
 
     @classmethod
-    def change_has_characters(cls, change):
-        try:
-            cls.has_characters[
-                change
-            ]  # to check if the specified key exists in the dictionary
-        except Exception as err:
-            print(f"Invalid \nan Exception: {err}")
-        else:
-            cls.has_characters[change] = not cls.has_characters[
-                change
-            ]  # automatically changers to the opposite value already there
-            print(f"{change} is now set to {cls.has_characters[change]}")
+    def change_character_type(cls, change: str) -> None:
+        """Toggle the value of a given character type in the dictionary.
+
+        Args:
+            change: A string indicating which character type to toggle.
+
+        Raises:
+            KeyError: If the specified key does not exist in the dictionary.
+        """
+        if change not in cls.CHARACTER_TYPES:
+            raise KeyError(f"Invalid character type: {change}")
+        cls.CHARACTER_TYPES[change] = not cls.CHARACTER_TYPES[change]
+        print(f"{change} is now set to {cls.CHARACTER_TYPES[change]}")
 
     @classmethod
-    def show_has_characters(cls):
-        print(cls.has_characters)  # print the output
+    def show_character_types(cls) -> None:
+        """Print the current values of the character types dictionary."""
+        print(cls.CHARACTER_TYPES)
 
-    def generate_password(self, lenght2):
-        sequence = PasswordGenerator.gen_sequence(list(self.has_characters.values()))
-        print(PasswordGenerator.gen_password(sequence, lenght2))
+    def generate_password(self, length: int) -> None:
+        """Generate a password based on the current character type settings and print it to the console.
+
+        Args:
+            length: The length of the password to be generated.
+        """
+        sequence = PasswordGenerator.gen_sequence(list(self.CHARACTER_TYPES.values()))
+        password = PasswordGenerator.gen_password(sequence, length)
+        print(f"Generated password: {password}")
+
+    @classmethod
+    def print_menu(cls) -> None:
+        """Print the program menu to the console."""
+        print(
+            "Welcome to the PassGen App!\n"
+            "Commands:\n"
+            "  generate password -> <length of the password>\n"
+            "  commands to change the characters to be used to generate passwords:\n"
+            f"{cls._format_character_types()}")
+
+    @classmethod
+    def _format_character_types(cls) -> str:
+        """Return a formatted string containing the character types dictionary."""
+        return "\n".join(f"  {k}: {v}" for k, v in cls.CHARACTER_TYPES.items())
 
 
-def list_to_vertical_string(list):
-    to_return = ""
-    for member in list:
-        to_return += f"{member}\n"
-    return to_return
-
-
-def decide_operation():
+def decide_operation() -> None:
+    """Get user input and execute the appropriate command."""
     user_input = input(": ")
     try:
-        int(user_input)
-    except:
-        Interface.change_has_characters(user_input)
-    else:
-        Interface().generate_password(int(user_input))
+        length = int(user_input)
+        Interface().generate_password(length)
+    except ValueError:
+        try:
+            Interface.change_character_type(user_input)
+        except KeyError as err:
+            print(f"Invalid character type: {err}")
+        else:
+            Interface.show_character_types()
     finally:
-        print("\n\n")
+        print("\n")
 
 
-def run():
-    menu = f"""Welcome to the PassGen App!
-Commands:
-generate password ->
-<lenght of the password>
 
-commands to change the characters to be used to generate passwords:
-{list_to_vertical_string(Interface.has_characters.keys())}
-        """
-    print(menu)
+def run() -> None:
+    """Run the PassGen program."""
+    Interface.print_menu()
     while True:
         decide_operation()
 
 
-class Run:
-    pass
+if __name__ == "__main__":
+    run()
 
-
-run()
